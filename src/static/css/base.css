@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
+h1 {
+    color: darkred;
+    padding: 6px 12px;
+
+    border-radius: 9999px;
+
+    background-color: aqua;
+
+    height: 200;
+    width: 100;
+    margin-top: 10;
+    display: inline-block
+}
+
+nav{
+    padding: 6px 12px;
+    border-color: aquamarine;
+    border-radius: 10px;
+    background-color: aliceblue;
+    display: inline-block;
+
+}
+
+p{
+    padding: 10px
+}
+
+.filecell{
+    font-size: 30px;
+}
+.file{
+    color:#9400ff;
+    font-family: "Comic Relief", "system-ui";
+    font-weight: 900;
+}
+.cell{
+    color:#0086ea;
+    font-family: "Tagesschrift", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+.inline{
+    display: inline;
+}
+
+.pro{
+    font-size: 28px;
+    font-family: "Cascadia Code", sans-serif;
+    display: inline-block;
+    background-color: #0086ea;
+    border-radius: 10px;
+    font-weight: 400;
+    color: #f0f8ff;
+
+
+}
+.padding_t1{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.register{
+    font-size: 28px;
+    font-family: "Roboto Flex", sans-serif;
+    font-weight: 500;
+    color: aliceblue;
+    border-radius: 10px;
+    background-color: #9400ff;
+    display: inline-block
+}
+.pass{
+    padding-left: 100px;
+}
+.width{
+    width: 300px;
+}
+
+
+input[type='text']{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 11px;
+    padding-bottom: 8px;
+    width: 150px;
+
+    height: 18px;
+    border-radius: 10px;
+    border-color: #ffffff;
+    font-size: 28px;
+    font-family: "Cascadia Code", sans-serif;
+    color: gray;
+}
+
+.find{
+    font-size: 28px;
+    font-family: "Cascadia Code", sans-serif;
+    color: aliceblue;
+    background-color: #9400ff;
+    border-radius: 10px;
+
+
+}
