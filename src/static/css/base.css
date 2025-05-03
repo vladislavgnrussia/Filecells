@@ -101,6 +101,22 @@ input[type='text']{
     color: aliceblue;
     background-color: #9400ff;
     border-radius: 10px;
+}
 
+a{
+    text-decoration: none
+}
+.letter{
+    font-size: 28px;
+    font-family: "Roboto Flex", sans-serif;
+    font-style: italic;
+    font-weight: 600;
+}
 
+.first{
+    color: #9400ff;
+    padding-left: 10px;
+}
+.other{
+    color: #0086ea;
 }

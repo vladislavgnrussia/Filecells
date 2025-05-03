@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect
 from SECRETS import Config
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, login_required, logout_user
 from data import db_session
 from data.Table_user import User
 from data.Table_cells import Cell
@@ -9,6 +9,10 @@ import datetime as dt
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['PERMANENT_SESSION_LIFETIME'] = dt.timedelta(
+    days=60
+)
+
 manager = LoginManager()
 manager.init_app(app)
 
@@ -18,6 +22,29 @@ def load_user(user_id):
     sess = db_session.create_session()
     user = sess.query(User).get(user_id)
     return user
+
+
+@app.route('/signin', methods=['GET', 'POST'])
+def sign_in():
+    if request.method == 'GET':
+        return render_template('signin.html', message='')
+    else:
+        sess = db_session.create_session()
+        user = sess.query(User).filter(User.email == request.form['email']).first()
+        user: User
+        if not all([request.form['password'], request.form['email']]):
+            return render_template('signin.html', message='Все поля обязательны!')
+        if user is None:
+            return render_template('signin.html', message='Пользователь с такой почтой не существует!')
+        if not user.check_password(request.form['password']):
+            return render_template('signin.html', message='Неверный пароль!')
+
+        if 'remember_me' in request.form.keys():
+            login_user(user, remember=True)
+        else:
+            login_user(user, remember=False)
+
+        return redirect('/')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -55,7 +82,12 @@ def register():
         sess.add(user)
         sess.commit()
 
-    return redirect('/')
+        if 'remember_me' in request.form.keys():
+            login_user(user, remember=True)
+        else:
+            login_user(user, remember=False)
+
+        return redirect('/')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -63,6 +95,13 @@ def main_page():
     return render_template('base.html')
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
+
+
 if __name__ == '__main__':
     db_session.global_init('db/database.db')
-    app.run(port=8080)
+    app.run(port=5000)
