@@ -14,6 +14,7 @@ class Cell(SqlAlchemyBase):
     hashed_password = sa.Column(sa.String, nullable=True)
     path = sa.Column(sa.String, nullable=False, unique=True)
     created_date = sa.Column(sa.DATETIME, default=dt.datetime.now())
+    weight_of_directory = sa.Column(sa.Float, nullable=False)
 
     def __init__(self, *args, password, **kwargs):
         super().__init__(*args, **kwargs)
