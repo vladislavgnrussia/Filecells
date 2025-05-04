@@ -14,6 +14,8 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     email = sa.Column(sa.String, nullable=False, unique=True, index=True)
     hashed_password = sa.Column(sa.String, nullable=False)
     crated_date = sa.Column(sa.DATETIME, default=dt.datetime.now())
+    available_memory = sa.Column(sa.Float, default=5.0)
+    is_account_pro = sa.Column(sa.Boolean, default=False)
 
     def __int__(self, *args, password, **kwargs):
         super.__init__(*args, **kwargs)

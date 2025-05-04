@@ -104,4 +104,4 @@ def logout():
 
 if __name__ == '__main__':
     db_session.global_init('db/database.db')
-    app.run(port=5000)
+    app.run(port=8080)
