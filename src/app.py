@@ -7,6 +7,12 @@ from data.Table_cells import Cell
 from forms.Register_form import Registration
 import datetime as dt
 
+"""
+TODO:
+1. Добавить валидацию e-mail с regular expressions
+2. Строку поиска на страницу со своими файлами
+"""
+
 app = Flask(__name__)
 app.config.from_object(Config)
 app.config['PERMANENT_SESSION_LIFETIME'] = dt.timedelta(
@@ -100,6 +106,21 @@ def main_page():
 def logout():
     logout_user()
     return redirect('/')
+
+
+@app.route('/directories')
+def directories():
+    return render_template('directories.html')
+
+
+@app.route('/add_files')
+def add_files():
+    return render_template('add_files.html')
+
+
+@app.route('/view_files')
+def view_files():
+    return render_template('view_files.html')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Title</title>
+
+        <link rel='stylesheet' href='/static/css/directories.css'>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class='inline'>
+            <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
+
+            <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+        </div>
+
+        <div class='pass-height-20px'></div>
+
+        <div class='sidebar'>
+
+            <div class='create-btn'><span class='plus'>+</span>Создать</div>
+
+        </div>
+
+        <div class='main-zone'>
+            <div class='main-text'>Мои ячейки</div>
+            <hr class='main-hr'>
+
+            <div class='card'>
+                <div class='name-directory'>{{directory_name}}</div>
+                <hr>
+                <div class='second-line'>
+                    <span>Автор: </span> <span class='author-name'>{{author}}</span>
+                    <span class='pass-width-40'></span>
+                    <span>Создано: </span><span class='maked-date'>{{created_date}}</span>
+                </div>
+                <hr>
+                <div class='description'>Описание: {{description}}</div>
+
+            </div>
+
+            <div class='pass-height-20px'></div>
+
+
+        </div>
+
+        <div class='pass-height-20px'></div>
+
+        <div class='storage-main'>
+            <div class='storage-word'>Хранилище</div>
+            <hr id='storage'>
+            <div class='other-text'>
+                Заполнено: {{used_memory}} ГБ
+                <div class='pass-height-10px'></div>
+                Доступно: {{available_memory}} ГБ
+            </div>
+        </div>
+
+        <div class="pass-height-10px"></div>
+
+        <div class='upgrade-storage'>
+            <div class='upgrade-text'>
+            Расширить хранилище
+            </div>
+        </div>
+
+    </body>
+</html>
