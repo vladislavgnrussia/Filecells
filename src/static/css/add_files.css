@@ -220,3 +220,27 @@ input[type='text']{
 input[type='file']{
     display: none
 }
+
+button[type='submit']{
+    border-radius: 20px;
+    height: 40px;
+    width: 175px;
+    background-color: white;
+    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.5);
+    border: none
+}
+
+.message{
+    background-color: #ffb2b2;
+    border: 1px solid;
+    border-color: #ff0000;
+    border-radius: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    font-family: "Cascadia Code", sans-serif;
+    color: #484848;
+    font-size: 11px;
+    display: inline;
+}
