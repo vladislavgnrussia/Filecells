@@ -181,6 +181,11 @@ hr{
     top: -42px;
     font-family: "Roboto", sans-serif;
     font-size: 20px;
+    width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .pass-horizontal-10px{
@@ -244,3 +249,35 @@ button[type='submit']{
     font-size: 11px;
     display: inline;
 }
+
+.delete_checkbox{
+    display: inline;
+    position: relative;
+    top: -35px;
+    float: right;
+    right: 5px;
+}
+
+input[type='checkbox']{
+    display: none
+}
+
+input[type='checkbox'] + label{
+    background: url('https://img.icons8.com/ios-glyphs/30/trash--v1.png');
+    height: 24px;
+    width: 24px;
+}
+
+input[type='checkbox']:checked + label{
+    background: url('../img/deleted.png');
+    height: 24px;
+    width: 24px;
+}
+
+#is_private{
+    display: inline;
+}
+
+#is_private + label{
+    background: none;
+  }

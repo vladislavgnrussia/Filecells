@@ -20,7 +20,7 @@
     <!--            crossorigin="anonymous"></script>-->
 </head>
 <body>
-<form action="" method="post" novalidate>
+<form action="" method="post" novalidate autocomplete="off">
     <header>
         <nav>
             <div class='inline'>
@@ -28,19 +28,18 @@
                 <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
                 <span class="pass"></span>
                 <span>
-                <input type="text" placeholder="Автор">
+                <input type="text" placeholder="Автор" name="author">
             </span>
                 <span class='width'>
-                <input type="text" placeholder="Название">
+                <input type="text" placeholder="Название" name="cellname">
             </span>
-                <span class='padding_t1 find'>Найти</span>
+                <button type="submit" class='padding_t1 find'>Найти</button>
                 <span class="pass"></span>
-                <span class="padding_t1 pro">Pro</span>
                 {% if not current_user.is_authenticated %}
                 <a href='/signin'><span class='padding_t1 register'> Войти </span></a>
                 {% else %}
-                <a href="/logout"><span class='letter first'>{{current_user.username[0]}}</span><span
-                        class='letter other'>{{current_user.username[1:]}}</span></a>
+                <span class="padding_t1 pro">Pro</span>
+                <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
                 {% endif %}
 
 

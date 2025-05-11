@@ -16,10 +16,11 @@ h1 {
 
 nav{
     padding: 6px 12px;
-    border-color: aquamarine;
     border-radius: 10px;
     background-color: aliceblue;
-    display: inline-block;
+    position: absolute;
+    width: 95%;
+    text-align: center;
 
 }
 
@@ -29,31 +30,31 @@ p{
 
 .filecell{
     font-size: 30px;
+    float: left;
 }
 .file{
     color:#9400ff;
     font-family: "Comic Relief", "system-ui";
     font-weight: 900;
+    float: left;
 }
 .cell{
     color:#0086ea;
     font-family: "Tagesschrift", system-ui;
     font-weight: 400;
     font-style: normal;
+    padding-top: 3px;
 }
-.inline{
-    display: inline;
-}
+
 
 .pro{
     font-size: 28px;
     font-family: "Cascadia Code", sans-serif;
-    display: inline-block;
     background-color: #0086ea;
     border-radius: 10px;
     font-weight: 400;
     color: #f0f8ff;
-
+    float: inline-end;
 
 }
 .padding_t1{
@@ -70,7 +71,7 @@ p{
     color: aliceblue;
     border-radius: 10px;
     background-color: #9400ff;
-    display: inline-block
+    float: inline-end;
 }
 .pass{
     padding-left: 100px;
@@ -85,7 +86,7 @@ input[type='text']{
     padding-right: 10px;
     padding-top: 11px;
     padding-bottom: 8px;
-    width: 150px;
+    width: 20%;
 
     height: 18px;
     border-radius: 10px;
@@ -93,6 +94,10 @@ input[type='text']{
     font-size: 28px;
     font-family: "Cascadia Code", sans-serif;
     color: gray;
+    text-align: center;
+
+
+
 }
 
 .find{
@@ -104,19 +109,24 @@ input[type='text']{
 }
 
 a{
-    text-decoration: none
+    color: #0086ea;
 }
 .letter{
     font-size: 28px;
     font-family: "Roboto Flex", sans-serif;
     font-style: italic;
     font-weight: 600;
+    float: inline-end;
+    padding-right: 10px;
 }
 
 .first{
     color: #9400ff;
-    padding-left: 10px;
 }
 .other{
     color: #0086ea;
+}
+.center{
+    text-align: center;
+
 }
