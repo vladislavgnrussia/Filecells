@@ -1,107 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Title</title>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
 
-        <link rel='stylesheet' href='/static/css/add_files.css'>
+    <link rel='stylesheet' href='/static/css/add_files.css'>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap" rel="stylesheet">
-    </head>
-    <body>
-    <form method="post" enctype="multipart/form-data" autocomplete="off">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap"
+          rel="stylesheet">
+</head>
+<body>
+<form method="post" enctype="multipart/form-data" autocomplete="off">
 
+    <div class='inline'>
+        <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
+
+        <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+    </div>
+
+    <div class='pass-height-20px'></div>
+    <div class='sidebar'>
+        <label for='ffile'><span class='plus'>+</span>Загрузить</label>
+        <input type='file' id='ffile' name="files" multiple>
+    </div>
+
+
+    <div class='main-zone'>
+        <div class='main-text'>Название:</div>
         <div class='inline'>
-            <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
-
-            <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+            <input type='text' name="title" value="{{title_dir}}" required>
+            {% if message != '' %}
+            <span class='message'>{{message}}</span>
+            {% endif %}
         </div>
 
         <div class='pass-height-20px'></div>
-        <div class='sidebar'>
-            <label for='ffile'><span class='plus'>+</span>Загрузить</label>
-            <input type='file' id='ffile' name="files" multiple>
-        </div>
 
-
-        <div class='main-zone'>
-            <div class='main-text'>Название:</div>
-            <div class='inline'>
-                <input type='text' name="title" value="{{title_dir}}" required>
-                {% if message != '' %}
-                    <span class='message'>{{message}}</span>
-                {% endif %}
-            </div>
-
-            <div class='pass-height-20px'></div>
-
-            <div class='main-text'>Описание:</div>
-            <div class='inline'>
+        <div class='main-text'>Описание:</div>
+        <div class='inline'>
             <input type='text' name="description" value="{{description}}">
-            </div>
-            <hr class='main-hr'>
-
-            <div class='type-word'>Файлы</div>
-            <div class='pass-height-20px'></div>
-
-            {% for file in files %}
-            <div class='file-card'>
-                <div><img width="30" height="30" src="https://img.icons8.com/ios-glyphs/100/file--v1.png" alt="file--v1" class='img-directory'></div>
-                <span class='filename'>{{file}}</span>
-                <input type="checkbox" class='delete_checkbox' name="del_{{file}}" id="del_{{file}}">
-                <label for='del_{{file}}' class="delete_checkbox"></label>
-            </div>
-            <span class='pass-horizontal-10px'></span>
-            {% endfor %}
-
-
         </div>
+        <hr class='main-hr'>
 
+        <div class='type-word'>Файлы</div>
         <div class='pass-height-20px'></div>
 
-        <div class='storage-main'>
-            <div class='storage-word'>Хранилище</div>
-            <hr class='storage'>
-            <div class='other-text'>
-                Заполнено: {{used_memory}} ГБ
-                <div class='pass-height-10px'></div>
-                Доступно: {{available_memory}} ГБ
-            </div>
+        {% for file in files %}
+        <div class='file-card'>
+            <div><img width="30" height="30" src="https://img.icons8.com/ios-glyphs/100/file--v1.png" alt="file--v1"
+                      class='img-directory'></div>
+            <span class='filename'>{{file}}</span>
+            <input type="checkbox" class='delete_checkbox' name="del_{{file}}" id="del_{{file}}">
+            <label for='del_{{file}}' class="delete_checkbox"></label>
         </div>
+        <span class='pass-horizontal-10px'></span>
+        {% endfor %}
 
-        <div class="pass-height-10px"></div>
 
-        {% if not is_pro %}
-        <div class='upgrade-storage'>
-            <div class='upgrade-text'>
+    </div>
+
+    <div class='pass-height-20px'></div>
+
+    <div class='storage-main'>
+        <div class='storage-word'>Хранилище</div>
+        <hr class='storage'>
+        <div class='other-text'>
+            Заполнено: {{used_memory}} ГБ
+            <div class='pass-height-10px'></div>
+            Доступно: {{available_memory}} ГБ
+        </div>
+    </div>
+
+    <div class="pass-height-10px"></div>
+
+    {% if not is_pro %}
+    <div class='upgrade-storage'>
+        <div class='upgrade-text'>
             Расширить хранилище
-            </div>
         </div>
-        {% endif %}
+    </div>
+    {% endif %}
 
-        <div class='pass-height-10px'></div>
+    <div class='pass-height-10px'></div>
 
-        <div class='storage-main'>
-            <div class='storage-word'>Доступ</div>
-            <hr class='storage'>
-            <div class='other-text'>
-                {% if is_private %}
-                <input type='checkbox' name="is_private" id="is_private" checked>
-                {% else %}
-                <input type='checkbox' name="is_private" id="is_private">
-                {% endif %}
-                <label>Приватная</label>
+    <div class='storage-main'>
+        <div class='storage-word'>Доступ</div>
+        <hr class='storage'>
+        <div class='other-text'>
+            {% if is_private %}
+            <input type='checkbox' name="is_private" id="is_private" checked>
+            {% else %}
+            <input type='checkbox' name="is_private" id="is_private">
+            {% endif %}
+            <label>Приватная</label>
 
-                <div class='pass-height-10px'></div>
-                <input type='password' placeholder="Пароль" name="password" autocomplete="new-password">
-            </div>
+            <div class='pass-height-10px'></div>
+            <input type='password' placeholder="Пароль" name="password" autocomplete="new-password">
         </div>
+    </div>
 
-        <div class='pass-height-10px'></div>
+    <div class='pass-height-10px'></div>
 
-        <button type='submit' class="upgrade_storage"><span class='upgrade-text'>Сохранить</span></button>
-    </form>
-    </body>
+    <button type='submit' class="upgrade_storage"><span class='upgrade-text'>Сохранить</span></button>
+</form>
+</body>
 </html>

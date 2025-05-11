@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, abort
 from SECRETS import Config
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data import db_session
 from data.Table_user import User
 from data.Table_cells import Cell
@@ -106,12 +106,12 @@ def main_page():
         if request.form.get('author').strip() != '':
             author = request.form.get('author')
         else:
-            author='none'
+            author = 'none'
 
         if request.form.get('cellname').strip() != '':
             cellname = request.form.get('cellname')
         else:
-            cellname ='none'
+            cellname = 'none'
         return redirect(f'/directories/author={author}/cellname={cellname}')
 
 
@@ -135,7 +135,6 @@ def directories(author: str, cellname: str):
         elif cellname == 'none':
             users = sess.query(User).filter(User.username.like(f'%{author}%'))
             users_id = [user.id for user in users[:5]]
-            print(users_id)
             dirs = sess.query(Cell).filter(Cell.user_id.in_(users_id))
 
         authors = {}
@@ -144,6 +143,10 @@ def directories(author: str, cellname: str):
             authors[cell.user_id] = user.username
         cellname = '' if cellname == 'none' else cellname
         author = '' if author == 'none' else author
+
+        if isinstance(current_user, AnonymousUserMixin):
+            return render_template('directories.html', directories=dirs, authors=authors,
+                                   query_author=author, query_cellname=cellname)
 
         user = sess.query(User).get(current_user.id)
         user: User
@@ -163,12 +166,12 @@ def directories(author: str, cellname: str):
         if request.form.get('author').strip() != '':
             author = request.form.get('author')
         else:
-            author='none'
+            author = 'none'
 
         if request.form.get('cellname').strip() != '':
             cellname = request.form.get('cellname')
         else:
-            cellname ='none'
+            cellname = 'none'
         return redirect(f'/directories/author={author}/cellname={cellname}')
 
 
@@ -259,7 +262,6 @@ def edit_files(dir_id):
         title = cell.cellname
         description = cell.description
 
-
         files = os.listdir(dir_path)
         available_memory = round(user.available_memory, 4)
         if user.is_account_pro:
@@ -292,7 +294,6 @@ def edit_files(dir_id):
             summary_weight += file.tell()
             file.seek(0, 0)
 
-
             if summary_weight <= available_memory * 2 ** 30 and file.filename != '':
                 file.save(f'{PATH_TO_FILES}/{current_user.username}/{title}/{file.filename}')
             else:
@@ -318,9 +319,45 @@ def edit_files(dir_id):
     return redirect(f'/edit_directory/{dir_id}')
 
 
-@app.route('/view_files')
-def view_files():
-    return render_template('view_files.html')
+@app.route('/view_files/<int:cell_id>', methods=['GET', 'POST'])
+def view_files(cell_id: int):
+    if request.method == 'GET':
+        sess = db_session.create_session()
+        cell = sess.query(Cell).get(cell_id)
+        path = cell.path
+        dir_title = cell.cellname
+
+        files = os.listdir(path)
+        if isinstance(current_user, AnonymousUserMixin):
+            return render_template('view_files.html',
+                                   message='', files=files, dir_title=dir_title)
+
+        user = sess.query(User).get(current_user.id)
+        user: User
+        available_memory = round(user.available_memory, 4)
+
+        if user.is_account_pro:
+            used_memory = 10 - available_memory
+        else:
+            used_memory = 5 - available_memory
+
+        used_memory = round(used_memory, 4)
+
+        return render_template('view_files.html', used_memory=used_memory,
+                               available_memory=available_memory, is_pro=user.is_account_pro,
+                               message='', files=files, dir_title=dir_title)
+    else:
+        if request.form.get('author').strip() != '':
+            author = request.form.get('author')
+        else:
+            author = 'none'
+
+        if request.form.get('cellname').strip() != '':
+            cellname = request.form.get('cellname')
+        else:
+            cellname = 'none'
+        return redirect(f'/directories/author={author}/cellname={cellname}')
+
 
 def get_user_available_memory(user: User) -> float:
     start = 10 if user.is_account_pro else 5
@@ -331,6 +368,7 @@ def get_user_available_memory(user: User) -> float:
             start -= os.path.getsize(f'{path_to_user}/{cell}/{file}') / 2 ** 30
 
     return start
+
 
 if __name__ == '__main__':
     db_session.global_init('db/database.db')

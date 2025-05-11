@@ -2,22 +2,23 @@ body{
     background: aliceblue;
 }
 
+
 .filecell{
     font-size: 30px;
-    padding-top: 10px;
-
+    float: left;
 }
 .file{
     color:#9400ff;
     font-family: "Comic Relief", "system-ui";
     font-weight: 900;
-    padding-left: 10px;
+    float: left;
 }
 .cell{
     color:#0086ea;
     font-family: "Tagesschrift", system-ui;
     font-weight: 400;
     font-style: normal;
+    padding-top: 3px;
 }
 
 .plus{
@@ -180,6 +181,55 @@ hr[id='storage']{
     top: -42px;
     font-family: "Roboto", sans-serif;
     font-size: 20px;
+    width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+input[type='text']{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 11px;
+    padding-bottom: 8px;
+    width: 20%;
+
+    height: 18px;
+    border-radius: 10px;
+    border-color: #ffffff;
+    font-size: 28px;
+    font-family: "Cascadia Code", sans-serif;
+    color: gray;
+    text-align: center;
+}
+
+.find{
+    font-size: 28px;
+    font-family: "Cascadia Code", sans-serif;
+    color: aliceblue;
+    background-color: #9400ff;
+    border-radius: 10px;
+}
+
+.padding_t1{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+nav{
+    text-align: center;
+}
+
+.register{
+    font-size: 28px;
+    font-family: "Roboto Flex", sans-serif;
+    font-weight: 500;
+    color: aliceblue;
+    border-radius: 10px;
+    background-color: #9400ff;
+    float: inline-end;
 }
 
 .pass-horizontal-10px{
@@ -190,4 +240,9 @@ hr[id='storage']{
 .type-word{
     font-size: 26px;
     font-family: "Roboto", sans-serif;
+}
+
+.pass-horizontal-10px{
+    padding-left: 10px;
+    display: inline-block;
 }

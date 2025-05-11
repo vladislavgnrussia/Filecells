@@ -1,71 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Title</title>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
 
-        <link rel='stylesheet' href='/static/css/view_files.css'>
+    <link rel='stylesheet' href='/static/css/view_files.css'>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap" rel="stylesheet">
-    </head>
-    <body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap"
+          rel="stylesheet">
+</head>
+<body>
+<form action="" method="post" novalidate autocomplete="off">
+    <nav>
         <div class='inline'>
+
             <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
+            <span>
+                <input type="text" placeholder="Автор" value="{{query_author}}" name="author">
+            </span>
+            <span class='width'>
+                <input type="text" placeholder="Название" value="{{query_cellname}}" name="cellname">
+            </span>
+            <button type='submit' class='padding_t1 find'>Найти</button>
 
+            {% if not current_user.is_authenticated %}
+            <a href='/signin'><span class='padding_t1 register'> Войти </span></a>
+            {% else %}
             <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+            {% endif %}
+
+
         </div>
+
+    </nav>
+    <div class='pass-height-20px'></div>
+    {% if current_user.is_authenticated %}
+    <div class='sidebar'>
+
+        <div class='create-btn'><span class='plus'>+</span>Создать</div>
+
+    </div>
+    {% endif %}
+
+    <div class='main-zone'>
+        <div class='main-text'>{{dir_title}}</div>
+        <hr class='main-hr'>
+        {% for file in files %}
+        <div class='file-card'>
+            <div><img width="30" height="30" src="https://img.icons8.com/ios-glyphs/100/file--v1.png" alt="file--v1"
+                      class='img-directory'></div>
+            <span class='filename'>{{file}}</span>
+        </div>
+        <div class='pass-horizontal-10px'></div>
+        {% endfor %}
 
         <div class='pass-height-20px'></div>
 
-        <div class='sidebar'>
 
-            <div class='create-btn'><span class='plus'>+</span>Создать</div>
+    </div>
 
+    <div class='pass-height-20px'></div>
+    {% if current_user.is_authenticated %}
+
+    <div class='storage-main'>
+        <div class='storage-word'>Хранилище</div>
+        <hr id='storage'>
+        <div class='other-text'>
+            Заполнено: {{used_memory}} ГБ
+            <div class='pass-height-10px'></div>
+            Доступно: {{available_memory}} ГБ
         </div>
+    </div>
 
-        <div class='main-zone'>
-            <div class='main-text'>{{name_directory}}</div>
-            <hr class='main-hr'>
+    <div class="pass-height-10px"></div>
 
-            <div class='type-word'>Папки</div>
-            <div class='pass-height-20px'></div>
-
-            <div class='file-card'>
-                <div><img width="30" height="30" src="https://img.icons8.com/ios-filled/30/folder-invoices--v2.png" alt="folder-invoices--v2" class='img-directory'></div>
-                <span class='filename'>ubuntu</span>
-            </div>
-
-            <div class='type-word'>Файлы</div>
-            <div class='pass-height-20px'></div>
-
-            <div class='file-card'>
-                <div><img width="30" height="30" src="https://img.icons8.com/ios-glyphs/100/file--v1.png" alt="file--v1" class='img-directory'></div>
-                <span class='filename'>ubuntu</span>
-            </div>
-
-        </div>
-
-        <div class='pass-height-20px'></div>
-
-        <div class='storage-main'>
-            <div class='storage-word'>Хранилище</div>
-            <hr id='storage'>
-            <div class='other-text'>
-                Заполнено: {{used_memory}} ГБ
-                <div class='pass-height-10px'></div>
-                Доступно: {{available_memory}} ГБ
-            </div>
-        </div>
-
-        <div class="pass-height-10px"></div>
-
-        <div class='upgrade-storage'>
-            <div class='upgrade-text'>
+    {% if not is_pro %}
+    <div class='upgrade-storage'>
+        <div class='upgrade-text'>
             Расширить хранилище
-            </div>
         </div>
+    </div>
+    {% endif %}
 
-    </body>
+    {% endif %}
+</form>
+</body>
 </html>
