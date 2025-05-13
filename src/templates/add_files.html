@@ -14,11 +14,28 @@
 <body>
 <form method="post" enctype="multipart/form-data" autocomplete="off">
 
-    <div class='inline'>
-        <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
+     <nav>
+        <div class='inline'>
 
-        <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
-    </div>
+            <span class='filecell file'>File</span><span class="filecell cell">Cell</span>
+            <span>
+                <input type="text" placeholder="Автор" value="{{query_author}}" name="author" class="input-text">
+            </span>
+            <span class='width'>
+                <input type="text" placeholder="Название" value="{{query_cellname}}" name="cellname" class="input-text">
+            </span>
+            <button type='submit' class='padding_t1 find' name="search" value="True">Найти</button>
+
+            {% if not current_user.is_authenticated %}
+            <a href='/signin'><span class='padding_t1 register'> Войти </span></a>
+            {% else %}
+            <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+            {% endif %}
+
+
+        </div>
+
+    </nav>
 
     <div class='pass-height-20px'></div>
     <div class='sidebar'>
@@ -30,7 +47,7 @@
     <div class='main-zone'>
         <div class='main-text'>Название:</div>
         <div class='inline'>
-            <input type='text' name="title" value="{{title_dir}}" required>
+            <input type='text' name="title" value="{{title_dir}}" required id="title">
             {% if message != '' %}
             <span class='message'>{{message}}</span>
             {% endif %}
@@ -40,7 +57,7 @@
 
         <div class='main-text'>Описание:</div>
         <div class='inline'>
-            <input type='text' name="description" value="{{description}}">
+            <input type='text' name="description" value="{{description}}" id="description">
         </div>
         <hr class='main-hr'>
 
@@ -103,7 +120,7 @@
 
     <div class='pass-height-10px'></div>
 
-    <button type='submit' class="upgrade_storage"><span class='upgrade-text'>Сохранить</span></button>
+    <button type='submit' class="upgrade_storage" id="save"><span class='upgrade-text'>Сохранить</span></button>
 </form>
 </body>
 </html>

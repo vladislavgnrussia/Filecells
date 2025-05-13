@@ -238,3 +238,36 @@ nav{
     background-color: #9400ff;
     float: inline-end;
 }
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.buttons{
+    width: 24px;
+    max-width: 24px;
+    height: 24px;
+    border: none;
+    float: right;
+    right: 7px;
+    position: relative;
+}
+
+.trash{
+    background-image: url('../img/trash_btn.png');
+
+}
+
+.download{
+    background-image: url('../img/download_btn.png');
+
+}
+
+.edit{
+    background-image: url('../img/edit_btn.png');
+
+}
+.highest-line{
+    text-align: center;
+}

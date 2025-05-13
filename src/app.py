@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, abort
+from flask import Flask, render_template, request, redirect, abort, session
 from SECRETS import Config
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data import db_session
@@ -6,6 +6,7 @@ from data.Table_user import User
 from data.Table_cells import Cell
 import datetime as dt
 import os
+import shutil
 
 """
 TODO:
@@ -29,6 +30,7 @@ PATH_TO_FILES = '/Users/vladgn/PycharmProjects/WebProject/files'
 def load_user(user_id) -> User:
     sess = db_session.create_session()
     user = sess.query(User).get(user_id)
+    sess.close()
     return user
 
 
@@ -40,6 +42,7 @@ def sign_in():
         sess = db_session.create_session()
         user = sess.query(User).filter(User.email == request.form['email']).first()
         user: User
+        sess.close()
         if not all([request.form['password'], request.form['email']]):
             return render_template('signin.html', message='Все поля обязательны!')
         if user is None:
@@ -89,6 +92,7 @@ def register():
         user.set_password(password)
         sess.add(user)
         sess.commit()
+        sess.close()
 
         if 'remember_me' in request.form.keys():
             login_user(user, remember=True)
@@ -129,13 +133,17 @@ def directories(author: str, cellname: str):
         dirs = []
         if author == 'none' and cellname == 'none':
             ...
-            return None
+            return redirect('/')
         if author == 'none':
             dirs = sess.query(Cell).filter(Cell.cellname.like(f'%{cellname}%'))
         elif cellname == 'none':
             users = sess.query(User).filter(User.username.like(f'%{author}%'))
             users_id = [user.id for user in users[:5]]
             dirs = sess.query(Cell).filter(Cell.user_id.in_(users_id))
+        else:
+            users = sess.query(User).filter(User.username.like(f'%{author}%'))
+            users_id = [user.id for user in users[:5]]
+            dirs = sess.query(Cell).filter(Cell.user_id.in_(users_id), Cell.cellname.like(f'%{cellname}%'))
 
         authors = {}
         for cell in dirs:
@@ -145,6 +153,7 @@ def directories(author: str, cellname: str):
         author = '' if author == 'none' else author
 
         if isinstance(current_user, AnonymousUserMixin):
+            sess.close()
             return render_template('directories.html', directories=dirs, authors=authors,
                                    query_author=author, query_cellname=cellname)
 
@@ -159,23 +168,32 @@ def directories(author: str, cellname: str):
 
         used_memory = round(used_memory, 4)
 
+        sess.close()
         return render_template('directories.html', directories=dirs, authors=authors, query_author=author,
                                query_cellname=cellname, is_pro=current_user.is_account_pro, used_memory=used_memory,
                                available_memory=available_memory)
     else:
-        if request.form.get('author').strip() != '':
-            author = request.form.get('author')
-        else:
-            author = 'none'
+        if request.form.get('search') == 'True':
+            if request.form.get('author').strip() != '':
+                author = request.form.get('author')
+            else:
+                author = 'none'
 
-        if request.form.get('cellname').strip() != '':
-            cellname = request.form.get('cellname')
-        else:
-            cellname = 'none'
-        return redirect(f'/directories/author={author}/cellname={cellname}')
+            if request.form.get('cellname').strip() != '':
+                cellname = request.form.get('cellname')
+            else:
+                cellname = 'none'
+            return redirect(f'/directories/author={author}/cellname={cellname}')
+        elif (dir_id := request.form.get('delete')) is not None:
+            delete_directory(dir_id, current_user.id)
+            return redirect(request.path)
+        elif (dir_id := request.form.get('edit')) is not None:
+            return redirect(f'../../edit_directory/{dir_id}')
+        else:  # download
+            ...
 
 
-@app.route('/add_files', methods=['GET', 'POST'])
+@app.route('/create_cell', methods=['GET', 'POST'])
 @login_required
 def add_files():
     if request.method == 'GET':
@@ -191,9 +209,22 @@ def add_files():
 
         used_memory = round(used_memory, 4)
 
+        sess.close()
         return render_template('add_files.html', used_memory=used_memory,
                                available_memory=available_memory, is_pro=user.is_account_pro, message='')
     else:
+        if request.form.get('search') == 'True':
+            if request.form.get('author').strip() != '':
+                author = request.form.get('author')
+            else:
+                author = 'none'
+
+            if request.form.get('cellname').strip() != '':
+                cellname = request.form.get('cellname')
+            else:
+                cellname = 'none'
+            return redirect(f'/directories/author={author}/cellname={cellname}')
+
         files = request.files.getlist('files')
         title = request.form['title']
         summary_weight = 0  # bytes
@@ -202,6 +233,7 @@ def add_files():
 
         check = sess.query(Cell).filter(Cell.user_id == current_user.id, Cell.cellname == title).first()
         if check:
+            sess.close()
             return render_template('add_files.html',
                                    message='Ячейка с таким названием уже существует!')
 
@@ -241,8 +273,9 @@ def add_files():
 
         sess.add(cell)
         sess.commit()
+        sess.close()
 
-    return redirect('/')
+    return redirect(f'../edit_directory/{cell.id}')
 
 
 @login_required
@@ -271,10 +304,23 @@ def edit_files(dir_id):
 
         used_memory = round(used_memory, 4)
 
+        sess.close()
         return render_template('add_files.html', used_memory=used_memory,
                                available_memory=available_memory, is_pro=user.is_account_pro, message='', files=files,
                                is_private=is_private, title_dir=title, description=description)
     else:
+        if request.form.get('search') == 'True':
+            if request.form.get('author').strip() != '':
+                author = request.form.get('author')
+            else:
+                author = 'none'
+
+            if request.form.get('cellname').strip() != '':
+                cellname = request.form.get('cellname')
+            else:
+                cellname = 'none'
+            return redirect(f'/directories/author={author}/cellname={cellname}')
+
         keys = list(request.form.keys())
         message = ''
 
@@ -315,6 +361,7 @@ def edit_files(dir_id):
 
         user.available_memory = get_user_available_memory(user)
         sess.commit()
+        sess.close()
 
     return redirect(f'/edit_directory/{dir_id}')
 
@@ -324,11 +371,19 @@ def view_files(cell_id: int):
     if request.method == 'GET':
         sess = db_session.create_session()
         cell = sess.query(Cell).get(cell_id)
+        cell: Cell
+
+        if cell.is_private and current_user.id != cell.user_id:
+            password = session.get(f'cell_id:{cell_id}')
+            if password is None or not cell.check_password(password):
+                return redirect(f'../password/{cell_id}')
+
         path = cell.path
         dir_title = cell.cellname
 
         files = os.listdir(path)
         if isinstance(current_user, AnonymousUserMixin):
+            sess.close()
             return render_template('view_files.html',
                                    message='', files=files, dir_title=dir_title)
 
@@ -343,6 +398,7 @@ def view_files(cell_id: int):
 
         used_memory = round(used_memory, 4)
 
+        sess.close()
         return render_template('view_files.html', used_memory=used_memory,
                                available_memory=available_memory, is_pro=user.is_account_pro,
                                message='', files=files, dir_title=dir_title)
@@ -359,6 +415,26 @@ def view_files(cell_id: int):
         return redirect(f'/directories/author={author}/cellname={cellname}')
 
 
+@app.route('/password/<int:cell_id>', methods=['GET', 'POST'])
+def password_for_private_cell(cell_id):
+    sess = db_session.create_session()
+    cell = sess.query(Cell).get(cell_id)
+    cell: Cell
+    sess.close()
+    if current_user.id == cell.user_id:
+        return redirect(f'../view_files/{cell_id}')
+    if request.method == 'GET':
+        return render_template('password.html', cellname=cell.cellname, message='')
+    else:
+        password = request.form.get('password')
+
+        if password is None or not cell.check_password(password):
+            return render_template('password.html', cellname=cell.cellname, message='Пароль не введен или неверный!')
+        session[f'cell_id:{cell_id}'] = password
+        return redirect(f'../view_files/{cell_id}')
+
+
+
 def get_user_available_memory(user: User) -> float:
     start = 10 if user.is_account_pro else 5
 
@@ -370,12 +446,21 @@ def get_user_available_memory(user: User) -> float:
     return start
 
 
+def delete_directory(dir_id, user_id) -> None:
+    sess = db_session.create_session()
+    cell = sess.query(Cell).get(dir_id)
+    cell: Cell
+    sess.delete(cell)
+    shutil.rmtree(cell.path)
+
+    user = sess.query(User).get(user_id)
+    user: User
+    user.available_memory = get_user_available_memory(user)
+
+    sess.commit()
+    sess.close()
+
+
 if __name__ == '__main__':
     db_session.global_init('db/database.db')
     app.run(port=8080)
-
-# db_session.global_init('db/database.db')
-# sess = db_session.create_session()
-# user = sess.query(User).get(6)
-# print(get_user_available_memory(user))
-# print(os.path.getsize('/Users/vladgn/PycharmProjects/WebProject/files/test1/gagaga/add_files.css'))

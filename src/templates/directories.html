@@ -23,7 +23,7 @@
             <span class='width'>
                 <input type="text" placeholder="Название" value="{{query_cellname}}" name="cellname">
             </span>
-            <button type='submit' class='padding_t1 find'>Найти</button>
+            <button type='submit' class='padding_t1 find' name="search" value="True">Найти</button>
 
             {% if not current_user.is_authenticated %}
             <a href='/signin'><span class='padding_t1 register'> Войти </span></a>
@@ -38,8 +38,9 @@
     <div class='pass-height-20px'></div>
     {% if current_user.is_authenticated %}
     <div class='sidebar'>
-
+        <a href="/create_cell">
         <div class='create-btn'><span class='plus'>+</span>Создать</div>
+        </a>
 
     </div>
     {% endif %}
@@ -48,18 +49,53 @@
         <div class='main-text'>Ячейки</div>
         <hr class='main-hr'>
         {% for dir in directories %}
-        <div class='card'>
-            <div class='name-directory'>{{dir.cellname}}</div>
-            <hr>
-            <div class='second-line'>
-                <span>Автор: </span> <span class='author-name'>{{authors[dir.user_id]}}</span>
-                <span class='pass-width-40'></span>
-                <span>Создано: </span><span class='maked-date'>{{dir.created_date}}</span>
-            </div>
-            <hr>
-            <div class='description'>Описание: {{dir.description}}</div>
+        {% if dir.is_private %}
+        <a href="/password/{{dir.id}}">
+            <div class='card'>
+                <div class='highest-line'>
+                    <span class='name-directory'>{{dir.cellname}}</span>
+                    {% if current_user.id == dir.user_id %}
+                    <button type='submit' class='buttons trash' name="delete" value="{{dir.id}}"></button>
+                    <button type='submit' class='buttons edit' name="edit" value="{{dir.id}}"></button>
+                    {% endif %}
+                    <button type='submit' class='buttons download' name="download" value="{{dir.id}}"></button>
 
-        </div>
+                </div>
+                <hr>
+                <div class='second-line'>
+                    <span>Автор: </span> <span class='author-name'>{{authors[dir.user_id]}}</span>
+                    <span class='pass-width-40'></span>
+                    <span>Создано: </span><span class='maked-date'>{{dir.created_date}}</span>
+                </div>
+                <hr>
+                <div class='description'>Описание: {{dir.description}}</div>
+
+            </div>
+        </a>
+        {% else %}
+        <a href="/view_files/{{dir.id}}">
+            <div class='card'>
+                <div class='highest-line'>
+                    <span class='name-directory'>{{dir.cellname}}</span>
+                    {% if current_user.id == dir.user_id %}
+                    <button type='submit' class='buttons trash' name="delete" value="{{dir.id}}"></button>
+                    <button type='submit' class='buttons edit' name="edit" value="{{dir.id}}"></button>
+                    {% endif %}
+                    <button type='submit' class='buttons download' name="download" value="{{dir.id}}"></button>
+
+                </div>
+                <hr>
+                <div class='second-line'>
+                    <span>Автор: </span> <span class='author-name'>{{authors[dir.user_id]}}</span>
+                    <span class='pass-width-40'></span>
+                    <span>Создано: </span><span class='maked-date'>{{dir.created_date}}</span>
+                </div>
+                <hr>
+                <div class='description'>Описание: {{dir.description}}</div>
+
+            </div>
+        </a>
+        {% endif %}
         <div class="pass-height-20px"></div>
         {% endfor %}
 
