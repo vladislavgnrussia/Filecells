@@ -39,7 +39,7 @@
     {% if current_user.is_authenticated %}
     <div class='sidebar'>
         <a href="/create_cell">
-        <div class='create-btn'><span class='plus'>+</span>Создать</div>
+            <div class='create-btn'><span class='plus'>+</span>Создать</div>
         </a>
 
     </div>
@@ -121,9 +121,11 @@
 
     {% if not is_pro %}
     <div class='upgrade-storage'>
-        <div class='upgrade-text'>
-            Расширить хранилище
-        </div>
+        <a href="/enter_code">
+            <div class='upgrade-text'>
+                Расширить хранилище
+            </div>
+        </a>
     </div>
     {% endif %}
     {% endif %}

@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data import db_session
 from data.Table_user import User
 from data.Table_cells import Cell
+from data.Table_codes_for_pro import Codes
 import datetime as dt
 import os
 import shutil
@@ -24,6 +25,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = dt.timedelta(
 manager = LoginManager()
 manager.init_app(app)
 PATH_TO_FILES = '/Users/vladgn/PycharmProjects/WebProject/files'
+ADMIN_ID = 7
 
 
 @manager.user_loader
@@ -92,13 +94,13 @@ def register():
         user.set_password(password)
         sess.add(user)
         sess.commit()
-        sess.close()
 
         if 'remember_me' in request.form.keys():
             login_user(user, remember=True)
         else:
             login_user(user, remember=False)
 
+        sess.close()
         return redirect('/')
 
 
@@ -273,9 +275,8 @@ def add_files():
 
         sess.add(cell)
         sess.commit()
-        sess.close()
 
-    return redirect(f'../edit_directory/{cell.id}')
+        return redirect(f'../edit_directory/{cell.id}')
 
 
 @login_required
@@ -363,7 +364,7 @@ def edit_files(dir_id):
         sess.commit()
         sess.close()
 
-    return redirect(f'/edit_directory/{dir_id}')
+        return redirect(f'/edit_directory/{dir_id}')
 
 
 @app.route('/view_files/<int:cell_id>', methods=['GET', 'POST'])
@@ -433,6 +434,55 @@ def password_for_private_cell(cell_id):
         session[f'cell_id:{cell_id}'] = password
         return redirect(f'../view_files/{cell_id}')
 
+
+@app.route('/create_code', methods=['GET', 'POST'])
+def add_code_for_pro():
+    if current_user.id != ADMIN_ID:
+        abort(403)
+
+    if request.method == 'GET':
+        return render_template('create_code.html', message='')
+    else:
+        code_value = request.form.get('code')
+        usings = request.form.get('usings')
+        sess = db_session.create_session()
+        if sess.query(Codes).filter(Codes.code == code_value).first():
+            return render_template('create_code.html', message='Такой код уже создан!')
+        code = Codes()
+        code.code = code_value
+        code.remain_using = usings
+        sess.add(code)
+        sess.commit()
+        sess.close()
+        return redirect(request.path)
+
+
+@app.route('/enter_code', methods=['GET', 'POST'])
+@login_required
+def enter_code():
+    if request.method == 'GET':
+        return render_template('enter_code.html', message='')
+    else:
+        code_value = request.form.get('code')
+        sess = db_session.create_session()
+        code = sess.query(Codes).filter(Codes.code == code_value).first()
+        code: Codes
+
+        if code is None:
+            sess.close()
+            return render_template('enter_code.html', message='Код неверен!')
+        elif code.remain_using == 0:
+            sess.close()
+            return render_template('enter_code.html', message='Код уже был использован!')
+
+        user = sess.query(User).get(current_user.id)
+        user: User
+        user.is_account_pro = True
+        code.remain_using -= 1
+
+        sess.commit()
+        sess.close()
+        return redirect('/')
 
 
 def get_user_available_memory(user: User) -> float:

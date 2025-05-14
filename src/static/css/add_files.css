@@ -325,3 +325,7 @@ input[type='checkbox']:checked + label{
 nav{
     text-align: center;
 }
+
+a {
+    text-decoration: none
+}

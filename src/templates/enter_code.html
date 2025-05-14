@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/css/password.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap" rel="stylesheet">
+</head>
+<body>
+<form action="" method="post" novalidate autocomplete="off">
+
+<main>
+    <div class='register-border'>
+        <span class='filecell file'>File</span><span class='filecell cell'>Cell</span>
+
+        <div class='pass-height'></div>
+
+        <div class='input'>
+
+            <div class='text'>
+                Введите код для расширения хранилища.
+            </div>
+        </div>
+
+        <div class='pass-height-20px'></div>
+
+        <div class='input'>
+            <input type='text' placeholder="Код" name="code">
+        </div>
+
+        {% if message != '' %}
+        <div class='input'>
+            <span class='message'>{{message}}</span>
+        </div>
+        {% endif %}
+
+        <div class='pass-left'>
+            <button type="submit">
+                Ввести
+            </button>
+        </div>
+    </div>
+
+    </main>
+</form>
+</body>
+</html>
