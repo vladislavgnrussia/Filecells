@@ -591,4 +591,9 @@ def clear_zips() -> None:
 if __name__ == '__main__':
     db_session.global_init('db/database.db')
 
+    sess = db_session.create_session()
+    for cell in sess.query(Cell).all():
+        sess.delete(cell)
+    sess.commit()
+
     app.run(port=8080)
