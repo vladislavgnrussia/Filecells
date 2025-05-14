@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request, redirect, abort, session, send_file
-from SECRETS import Config
+from zips.SECRETS import Config
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data import db_session
 from data.Table_user import User
 from data.Table_cells import Cell
 from data.Table_codes_for_pro import Codes
-from werkzeug.utils import secure_filename
 import datetime as dt
 import os
 import shutil
