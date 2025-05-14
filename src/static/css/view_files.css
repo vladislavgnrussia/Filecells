@@ -251,3 +251,18 @@ a {
     text-decoration: none;
     color: black;
 }
+
+.buttons{
+    width: 24px;
+    max-width: 24px;
+    height: 24px;
+    border: none;
+    float: right;
+    right: 8px;
+    top: -32px;
+    position: relative;
+}
+
+.download{
+    background-image: url('../img/download_btn.png');
+}

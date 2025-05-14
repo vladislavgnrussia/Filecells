@@ -50,6 +50,7 @@
         <hr class='main-hr'>
         {% for dir in directories %}
         {% if dir.is_private %}
+        {% if current_user.is_authenticated %}
         <a href="/password/{{dir.id}}">
             <div class='card'>
                 <div class='highest-line'>
@@ -72,6 +73,8 @@
 
             </div>
         </a>
+        <div class='pass-height-20px'></div>
+        {% endif %}
         {% else %}
         <a href="/view_files/{{dir.id}}">
             <div class='card'>
@@ -95,11 +98,9 @@
 
             </div>
         </a>
-        {% endif %}
-        <div class="pass-height-20px"></div>
-        {% endfor %}
-
         <div class='pass-height-20px'></div>
+        {% endif %}
+        {% endfor %}
 
 
     </div>

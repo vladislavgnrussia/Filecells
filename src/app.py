@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, abort, session
+from flask import Flask, render_template, request, redirect, abort, session, send_file
 from SECRETS import Config
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, AnonymousUserMixin
 from data import db_session
 from data.Table_user import User
 from data.Table_cells import Cell
 from data.Table_codes_for_pro import Codes
+from werkzeug.utils import secure_filename
 import datetime as dt
 import os
 import shutil
@@ -25,6 +26,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = dt.timedelta(
 manager = LoginManager()
 manager.init_app(app)
 PATH_TO_FILES = '/Users/vladgn/PycharmProjects/WebProject/files'
+PATH_TO_ZIPS = '/Users/vladgn/PycharmProjects/WebProject/zips'
 ADMIN_ID = 7
 
 
@@ -161,6 +163,7 @@ def directories(author: str, cellname: str):
 
         user = sess.query(User).get(current_user.id)
         user: User
+        user.available_memory = get_user_available_memory(user)
         available_memory = round(user.available_memory, 4)
 
         if user.is_account_pro:
@@ -189,10 +192,26 @@ def directories(author: str, cellname: str):
         elif (dir_id := request.form.get('delete')) is not None:
             delete_directory(dir_id, current_user.id)
             return redirect(request.path)
+
         elif (dir_id := request.form.get('edit')) is not None:
             return redirect(f'../../edit_directory/{dir_id}')
+
         else:  # download
-            ...
+
+            clear_zips()
+            dir_id = request.form.get('download')
+            sess = db_session.create_session()
+            cell = sess.query(Cell).get(dir_id)
+            cell: Cell
+
+            if cell.is_private and current_user.id != cell.user_id:
+                password = session.get(f'cell_id:{cell.id}')
+                if password is None or not cell.check_password(password):
+                    return redirect(f'../../password/{cell.id}')
+
+            shutil.make_archive(f'../zips/{cell.cellname}', 'zip', cell.path)
+
+            return send_file(f'../zips/{cell.cellname}.zip', as_attachment=True)
 
 
 @app.route('/create_cell', methods=['GET', 'POST'])
@@ -240,11 +259,11 @@ def add_files():
                                    message='Ячейка с таким названием уже существует!')
 
         try:
-            os.mkdir(f'{PATH_TO_FILES}/{current_user.username}')
+            os.mkdir(f'{PATH_TO_FILES}/{current_user.email}')
         except FileExistsError:
             pass
         try:
-            os.mkdir(f'{PATH_TO_FILES}/{current_user.username}/{title}')
+            os.mkdir(f'{PATH_TO_FILES}/{current_user.email}/{title}')
         except FileExistsError:
             pass
 
@@ -253,14 +272,14 @@ def add_files():
             summary_weight += file.tell()
 
             if summary_weight <= available_memory * 2 ** 30 and file.filename != '':
-                file.save(f'{PATH_TO_FILES}/{current_user.username}/{title}/{file.filename}')
+                file.save(f'{PATH_TO_FILES}/{current_user.email}/{title}/{file.filename}')
             else:
                 pass
 
         cell = Cell()
         cell.cellname = title
         cell.user_id = current_user.id
-        cell.path = f'{PATH_TO_FILES}/{current_user.username}/{title}'
+        cell.path = f'{PATH_TO_FILES}/{current_user.email}/{title}'
         cell.description = request.form.get('description')
         if request.form.get('is_private') is not None:
             cell.is_private = True
@@ -271,7 +290,7 @@ def add_files():
         cell.weight_of_directory = summary_weight / 2 ** 30
 
         user = sess.query(User).get(current_user.id)
-        user.available_memory -= summary_weight / 2 ** 30
+        user.available_memory = get_user_available_memory(user)
 
         sess.add(cell)
         sess.commit()
@@ -335,14 +354,14 @@ def edit_files(dir_id):
         available_memory = user.available_memory
         title = request.form.get('title')
 
-        os.rename(dir_path, f'{PATH_TO_FILES}/{current_user.username}/{title}')
+        os.rename(dir_path, f'{PATH_TO_FILES}/{current_user.email}/{title}')
         for file in files:
             file.seek(0, os.SEEK_END)
             summary_weight += file.tell()
             file.seek(0, 0)
 
             if summary_weight <= available_memory * 2 ** 30 and file.filename != '':
-                file.save(f'{PATH_TO_FILES}/{current_user.username}/{title}/{file.filename}')
+                file.save(f'{PATH_TO_FILES}/{current_user.email}/{title}/{file.filename}')
             else:
                 message = 'Вся доступная память использована!'
 
@@ -358,7 +377,7 @@ def edit_files(dir_id):
             cell.is_private = False
             cell.hashed_password = ''
 
-        cell.path = f'{PATH_TO_FILES}/{current_user.username}/{title}'
+        cell.path = f'{PATH_TO_FILES}/{current_user.email}/{title}'
 
         user.available_memory = get_user_available_memory(user)
         sess.commit()
@@ -390,6 +409,7 @@ def view_files(cell_id: int):
 
         user = sess.query(User).get(current_user.id)
         user: User
+        user.available_memory = get_user_available_memory(user)
         available_memory = round(user.available_memory, 4)
 
         if user.is_account_pro:
@@ -404,19 +424,27 @@ def view_files(cell_id: int):
                                available_memory=available_memory, is_pro=user.is_account_pro,
                                message='', files=files, dir_title=dir_title)
     else:
-        if request.form.get('author').strip() != '':
-            author = request.form.get('author')
-        else:
-            author = 'none'
+        if request.form.get('search') == 'True':
+            if request.form.get('author').strip() != '':
+                author = request.form.get('author')
+            else:
+                author = 'none'
 
-        if request.form.get('cellname').strip() != '':
-            cellname = request.form.get('cellname')
+            if request.form.get('cellname').strip() != '':
+                cellname = request.form.get('cellname')
+            else:
+                cellname = 'none'
+            return redirect(f'/directories/author={author}/cellname={cellname}')
         else:
-            cellname = 'none'
-        return redirect(f'/directories/author={author}/cellname={cellname}')
+            filename = request.form.get('download')
+            sess = db_session.create_session()
+            cell = sess.query(Cell).get(cell_id)
+            cell: Cell
+            return send_file(f'{cell.path}/{filename}', as_attachment=True)
 
 
 @app.route('/password/<int:cell_id>', methods=['GET', 'POST'])
+@login_required
 def password_for_private_cell(cell_id):
     sess = db_session.create_session()
     cell = sess.query(Cell).get(cell_id)
@@ -526,10 +554,11 @@ def change_username():
 def get_user_available_memory(user: User) -> float:
     start = 10 if user.is_account_pro else 5
 
-    path_to_user = f'{PATH_TO_FILES}/{user.username}'
-    for cell in os.listdir(path_to_user):
-        for file in os.listdir(f'{path_to_user}/{cell}'):
-            start -= os.path.getsize(f'{path_to_user}/{cell}/{file}') / 2 ** 30
+    path_to_user = f'{PATH_TO_FILES}/{user.email}'
+    if os.path.exists(path_to_user):
+        for cell in os.listdir(path_to_user):
+            for file in os.listdir(f'{path_to_user}/{cell}'):
+                start -= os.path.getsize(f'{path_to_user}/{cell}/{file}') / 2 ** 30
 
     return start
 
@@ -549,6 +578,11 @@ def delete_directory(dir_id, user_id) -> None:
     sess.close()
 
 
+def clear_zips() -> None:
+    for file in os.listdir(PATH_TO_ZIPS):
+        os.remove(f'{PATH_TO_ZIPS}/{file}')
+
 if __name__ == '__main__':
     db_session.global_init('db/database.db')
+
     app.run(port=8080)
