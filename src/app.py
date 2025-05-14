@@ -485,6 +485,44 @@ def enter_code():
         return redirect('/')
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'GET':
+        name = current_user.username
+        email = current_user.email
+        available_memory = round(current_user.available_memory, 4)
+        return render_template('profile.html', username=name, email=email, memory=available_memory)
+    else:
+        form = request.form
+        if form.get('my-cells') == 'True':
+            return redirect(f'/directories/author={current_user.username}/cellname=none')
+        elif form.get('get-pro') == 'True':
+            return redirect('/enter_code')
+        elif form.get('edit-profile') == 'True':
+            return redirect('/change_username')
+        else:
+            return redirect('/logout')
+
+
+@app.route('/change_username', methods=['GET', 'POST'])
+@login_required
+def change_username():
+    if request.method == 'GET':
+        return render_template('change_username.html', message='')
+    else:
+        new_username = request.form.get('new_username')
+        sess = db_session.create_session()
+        if sess.query(User).filter(User.username == new_username).first():
+            sess.close()
+            return render_template('change_username.html', message='Пользователь с таким именем уже существует!')
+        user = sess.query(User).get(current_user.id)
+        user: User
+        user.username = new_username
+        sess.commit()
+        sess.close()
+        return redirect('/profile')
+
 def get_user_available_memory(user: User) -> float:
     start = 10 if user.is_account_pro else 5
 

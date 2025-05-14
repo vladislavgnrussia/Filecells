@@ -29,7 +29,7 @@
             {% if not current_user.is_authenticated %}
             <a href='/signin'><span class='padding_t1 register'> Войти </span></a>
             {% else %}
-            <a href="/logout"><span class='letter first'>{{current_user.username}}</span></a>
+            <a href="/profile"><span class='letter first'>{{current_user.username}}</span></a>
             {% endif %}
 
 
