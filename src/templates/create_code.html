@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Comfortaa:wght@300..700&family=Comic+Relief:wght@400;700&family=Roboto+Flex:opsz,wght@8..144,100..1000&family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Tagesschrift&display=swap" rel="stylesheet">
 </head>
 <body>
-<form action="" method="post" novalidate autocomplete="off">
+<form action="" method="post" autocomplete="off">
 
 <main>
     <div class='register-border'>
@@ -20,10 +20,10 @@
         <div class='pass-height-20px'></div>
 
         <div class='input'>
-            <input type='text' placeholder="Код" name="code">
+            <input type='text' placeholder="Код" name="code" required>
         </div>
         <div class='input'>
-            <input type='number' placeholder="Количество использований" name="usings">
+            <input type='number' placeholder="Количество использований" name="usings" required>
         </div>
 
         {% if message != '' %}

@@ -173,6 +173,7 @@ def directories(author: str, cellname: str):
 
         used_memory = round(used_memory, 4)
 
+        sess.commit()
         sess.close()
         return render_template('directories.html', directories=dirs, authors=authors, query_author=author,
                                query_cellname=cellname, is_pro=current_user.is_account_pro, used_memory=used_memory,
@@ -371,7 +372,7 @@ def edit_files(dir_id):
 
         if request.form.get('is_private') is not None:
             cell.is_private = True
-            if request.form.get('password') is not None:
+            if request.form.get('password'):
                 cell.set_password(request.form.get('password'))
         else:
             cell.is_private = False
@@ -419,9 +420,11 @@ def view_files(cell_id: int):
 
         used_memory = round(used_memory, 4)
 
+        is_pro = user.is_account_pro
+        sess.commit()
         sess.close()
         return render_template('view_files.html', used_memory=used_memory,
-                               available_memory=available_memory, is_pro=user.is_account_pro,
+                               available_memory=available_memory, is_pro=is_pro,
                                message='', files=files, dir_title=dir_title)
     else:
         if request.form.get('search') == 'True':
@@ -450,6 +453,9 @@ def password_for_private_cell(cell_id):
     cell = sess.query(Cell).get(cell_id)
     cell: Cell
     sess.close()
+    password = session.get(f'cell_id:{cell.id}')
+    if cell.check_password(password):
+        return redirect(f'../view_files/{cell_id}')
     if current_user.id == cell.user_id:
         return redirect(f'../view_files/{cell_id}')
     if request.method == 'GET':
@@ -478,7 +484,7 @@ def add_code_for_pro():
             return render_template('create_code.html', message='Такой код уже создан!')
         code = Codes()
         code.code = code_value
-        code.remain_using = usings
+        code.remain_using = abs(int(usings))
         sess.add(code)
         sess.commit()
         sess.close()

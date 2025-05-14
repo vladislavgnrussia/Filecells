@@ -5,6 +5,7 @@
     height: 481px;
     border: 3px solid;
     border-color: #0086ea;
+    transform: translate(0, +50%);
 }
 
 .filecell{
@@ -95,4 +96,11 @@ button[type='submit']{
 .text{
     font-family: "Cascadia Code", sans-serif;
     color: gray;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    position: relative;
+
 }
